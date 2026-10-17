@@ -1,0 +1,245 @@
+
+const $ = id => document.getElementById(id);
+
+let particlesOn = true;
+let postCount = 0;
+let toastTimer;
+
+function showToast(message) {
+  const toast = $("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2400);
+}
+
+function createParticles() {
+  const root = $("particles");
+  root.replaceChildren();
+
+  if (!particlesOn) return;
+
+  for (let i = 0; i < 35; i++) {
+    const particle = document.createElement("span");
+    particle.className = "particle";
+
+    particle.style.left = Math.random() * 100 + "%";
+    particle.style.animationDuration = 7 + Math.random() * 12 + "s";
+    particle.style.animationDelay = -Math.random() * 18 + "s";
+
+    const size = 1 + Math.random() * 2;
+    particle.style.width = size + "px";
+    particle.style.height = size + "px";
+
+    root.appendChild(particle);
+  }
+}
+
+$("particlesToggle").addEventListener("click", () => {
+  particlesOn = !particlesOn;
+  createParticles();
+
+  showToast(particlesOn ? "Particles enabled" : "Particles disabled");
+});
+
+function openEditor() {
+  $("nameInput").value = $("displayName").textContent;
+
+  $("handleInput").value =
+    $("displayHandle").textContent.split(" ")[0].replace("@", "");
+
+  $("avatarInput").value = $("avatar").textContent;
+  $("bioInput").value = $("displayBio").textContent;
+
+  $("editor").classList.add("open");
+}
+
+function closeEditor() {
+  $("editor").classList.remove("open");
+}
+
+$("editOpen").addEventListener("click", openEditor);
+$("editOpen2").addEventListener("click", openEditor);
+$("editClose").addEventListener("click", closeEditor);
+
+$("editor").addEventListener("click", event => {
+  if (event.target === $("editor")) closeEditor();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeEditor();
+});
+
+function saveProfile() {
+  const profile = {
+    name: $("displayName").textContent,
+    handle: $("displayHandle").dataset.handle || "noiruser",
+    avatar: $("avatar").textContent,
+    bio: $("displayBio").textContent
+  };
+
+  try {
+    localStorage.setItem("noirProfile", JSON.stringify(profile));
+  } catch {
+    showToast("Browser storage is unavailable");
+  }
+}
+
+function loadProfile() {
+  try {
+    const profile = JSON.parse(
+      localStorage.getItem("noirProfile") || "null"
+    );
+
+    if (!profile) return;
+
+    $("displayName").textContent = profile.name || "Noir User";
+    $("displayHandle").dataset.handle = profile.handle || "noiruser";
+    $("displayHandle").replaceChildren();
+
+    const handle = document.createElement("span");
+    handle.textContent = "@" + (profile.handle || "noiruser") + " ";
+
+    const online = document.createElement("span");
+    online.className = "online";
+
+    $("displayHandle").append(handle, online, " Online");
+    $("avatar").textContent = profile.avatar || "N";
+    $("displayBio").textContent = profile.bio || "";
+  } catch {
+    // Keep the default profile if saved data is unavailable.
+  }
+}
+
+$("editForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const name = $("nameInput").value.trim();
+  const handle = $("handleInput").value
+    .trim()
+    .replace(/^@/, "")
+    .replace(/\s/g, "")
+    .slice(0, 24);
+
+  if (!name || !handle) {
+    showToast("Enter a display name and username");
+    return;
+  }
+
+  $("displayName").textContent = name;
+  $("displayHandle").dataset.handle = handle;
+  $("displayHandle").replaceChildren();
+
+  const handleText = document.createElement("span");
+  handleText.textContent = "@" + handle + " ";
+
+  const online = document.createElement("span");
+  online.className = "online";
+
+  $("displayHandle").append(handleText, online, " Online");
+  $("avatar").textContent = $("avatarInput").value.trim().slice(0, 2) || "N";
+  $("displayBio").textContent = $("bioInput").value.trim();
+
+  saveProfile();
+  closeEditor();
+  showToast("Profile saved on this device");
+});
+
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    $("posts").hidden = button.dataset.tab !== "posts";
+    $("about").hidden = button.dataset.tab !== "about";
+  });
+});
+
+function addPost(message, save = true) {
+  const article = document.createElement("article");
+  article.className = "post";
+
+  const metadata = document.createElement("small");
+  metadata.textContent =
+    $("displayName").textContent.toUpperCase() + " · POST";
+
+  const text = document.createElement("p");
+  text.textContent = message;
+
+  article.append(metadata, text);
+  $("postList").prepend(article);
+
+  postCount++;
+  $("postCount").textContent = String(postCount).padStart(2, "0");
+
+  if (save) savePosts();
+}
+
+function savePosts() {
+  try {
+    const posts = [...$("postList").querySelectorAll(".post p")]
+      .map(post => post.textContent);
+
+    localStorage.setItem("noirPosts", JSON.stringify(posts));
+  } catch {
+    // Posts still work for the current page session.
+  }
+}
+
+function loadPosts() {
+  try {
+    const posts = JSON.parse(localStorage.getItem("noirPosts") || "[]");
+
+    if (!Array.isArray(posts)) return;
+
+    posts.slice(0, 50).reverse().forEach(message => {
+      if (typeof message === "string") addPost(message, false);
+    });
+  } catch {
+    // Start with an empty post list.
+  }
+}
+
+$("postForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const input = $("postInput");
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  addPost(message);
+  input.value = "";
+  showToast("Post saved on this device");
+});
+
+$("searchForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const query = $("searchInput").value.trim().replace(/^@/, "").toLowerCase();
+
+  if (!query) {
+    showToast("Enter a username");
+    return;
+  }
+
+  const name = $("displayName").textContent.toLowerCase();
+  const handle = $("displayHandle").dataset.handle || "noiruser";
+
+  if (name.includes(query) || handle.toLowerCase().includes(query)) {
+    $("profile").scrollIntoView({ behavior: "smooth" });
+    showToast("Profile found");
+  } else {
+    showToast("No matching profiles found");
+  }
+});
+
+loadProfile();
+loadPosts();
+createParticles();
