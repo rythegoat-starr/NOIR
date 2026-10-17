@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050505">
+  <title>NOIR | Your Identity</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="particles"></div>
+
+  <header class="topbar">
+    <a href="#" class="logo">N<span>.</span></a>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#profile">Profile</a>
+      <button class="outline" id="editOpen">Edit Profile</button>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="eyebrow">YOUR SPACE. YOUR IDENTITY.</div>
+      <h1>Less noise.<br><span>More you.</span></h1>
+      <p>Your own corner of the internet.</p>
+      <form id="searchForm" class="search">
+        <input id="searchInput" placeholder="Search usernames..." aria-label="Search usernames">
+        <button>Search</button>
+      </form>
+    </section>
+
+    <section class="profile card" id="profile">
+      <div class="banner"><div class="banner-mark">N.</div></div>
+      <div class="profilehead">
+        <div class="avatar" id="avatar">N</div>
+        <div class="identity">
+          <h2 id="displayName">Noir User</h2>
+          <div class="handle" id="displayHandle">@noiruser <span class="online"></span> Online</div>
+        </div>
+      </div>
+
+      <p class="bio" id="displayBio">Welcome to my space. Nothing extra, everything personal.</p>
+
+      <div class="stats">
+        <div><strong id="postCount">00</strong><span>Posts</span></div>
+        <div><strong>128</strong><span>Views</span></div>
+        <div><strong>04</strong><span>Links</span></div>
+      </div>
+
+      <div class="socials">
+        <a href="https://github.com/" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://youtube.com/" target="_blank" rel="noopener">YouTube ↗</a>
+        <a href="https://discord.com/" target="_blank" rel="noopener">Discord ↗</a>
+        <a href="https://tiktok.com/" target="_blank" rel="noopener">TikTok ↗</a>
+      </div>
+
+      <div class="energy-line"></div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="posts">Posts</button>
+        <button class="tab" data-tab="about">About</button>
+      </div>
+
+      <section id="posts">
+        <form id="postForm" class="post-form">
+          <input id="postInput" placeholder="Write something..." maxlength="240" required>
+          <button>Post</button>
+        </form>
+        <div id="postList"></div>
+      </section>
+
+      <section id="about" hidden>
+        <p class="muted">Your personal space on NOIR. Customize your profile and add your favorite links.</p>
+      </section>
+    </section>
+
+    <section class="bottom-grid">
+      <div class="card">
+        <h3>THE EXPERIENCE</h3>
+        <p class="muted">Floating particles, glowing borders, smooth animations, and a monochrome design.</p>
+        <button class="outline" id="particlesToggle">Toggle Particles</button>
+      </div>
+      <div class="card">
+        <h3>MAKE IT YOURS</h3>
+        <p class="muted">Change your display name, username, avatar letter, and biography.</p>
+        <button id="editOpen2">Customize Profile ↗</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>NOIR · YOUR IDENTITY · 2026</footer>
+
+  <div class="modal" id="editor">
+    <form class="modal-card card" id="editForm">
+      <h2>Edit Profile</h2>
+      <p class="muted">Your changes save on this device.</p>
+
+      <label for="nameInput">Display name</label>
+      <input id="nameInput" maxlength="32" required>
+
+      <label for="handleInput">Username</label>
+      <input id="handleInput" maxlength="24" required>
+
+      <label for="avatarInput">Avatar letters</label>
+      <input id="avatarInput" maxlength="2">
+
+      <label for="bioInput">Biography</label>
+      <textarea id="bioInput" rows="3" maxlength="180"></textarea>
+
+      <div class="actions">
+        <button type="submit">Save Changes</button>
+        <button type="button" class="outline" id="editClose">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
